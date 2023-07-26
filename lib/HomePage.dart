@@ -101,14 +101,17 @@ class _HomePageState extends State<HomePage> {
                         await SharedPreferences.getInstance();
                     late int? save;
                     save = shared.getInt("bookMark");
-                    // ignore: use_build_context_synchronously
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context) {
-                        return HomePage(
-                          getPagenumb: save! - 1,
-                        );
-                      },
-                    ));
+                    if (save == null) {
+                    } else {
+                      // ignore: use_build_context_synchronously
+                      Navigator.push(context, MaterialPageRoute(
+                        builder: (context) {
+                          return HomePage(
+                            getPagenumb: save! - 1,
+                          );
+                        },
+                      ));
+                    }
                   },
                   child: const Icon(Icons.bookmark)),
             ],
