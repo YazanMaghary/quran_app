@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:quran/quran.dart' as Quran;
 
 class HomePage extends StatefulWidget {
-  late int? getPagenumb = 0;
+  late int? getPagenumb;
   HomePage({this.getPagenumb});
   @override
   State<HomePage> createState() => _HomePageState();
@@ -23,17 +23,22 @@ class _HomePageState extends State<HomePage> {
   Future<void> savePage(int page) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setInt("page", page);
-
+    widget.getPagenumb = 0;
     print("Success");
   }
 
   Future<void> getPage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     // quran.QuranPages(prefs.getInt("page"));
-    widget.getPagenumb = prefs.getInt("page");
     print("success");
-    isLoading = false;
-    setState(() {});
+    if (prefs.getInt("page") == null) {
+      widget.getPagenumb = 0;
+    } else {
+      widget.getPagenumb = prefs.getInt("page");
+    }
+    setState(() {
+      isLoading = false;
+    });
   }
 
   // Future<void> saveBookmark(int page) async {
@@ -86,7 +91,6 @@ class _HomePageState extends State<HomePage> {
                     SharedPreferences shared =
                         await SharedPreferences.getInstance();
                     shared.setInt("bookMark", pageNumber);
-                    setState(() {});
                   },
                   child: const Icon(Icons.bookmark_add)),
               ElevatedButton(
@@ -105,63 +109,68 @@ class _HomePageState extends State<HomePage> {
                         );
                       },
                     ));
-                    setState(() {});
                   },
                   child: const Icon(Icons.bookmark)),
             ],
           ),
-          body: PageView.builder(
-              controller: PageController(
-                  initialPage: widget.getPagenumb!, keepPage: true),
-              reverse: true,
-              onPageChanged: (value) async {
-                await savePage(value);
-
-                setState(() {});
-              },
-              itemCount: 603,
-              itemBuilder: (context, index) {
-                pageNumber = index + 1;
-                return Container(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [
-                    index % 2 == 0
-                        ? const Color(0xffd6c08e)
-                        : const Color(0xffe5dabc),
-                    index % 2 == 0
-                        ? const Color(0xffe5dabc)
-                        : const Color(0xffd6c08e)
-                  ])),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: PhotoView(
-                          backgroundDecoration:
-                              const BoxDecoration(color: Colors.transparent),
-                          imageProvider: AssetImage(
-                            quran.QuranPages(pageNumber),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        alignment: Alignment.center,
-                        decoration: const BoxDecoration(
-                            color: Colors.transparent, shape: BoxShape.circle),
-                        width: 50,
-                        height: 50,
-                        child: Text(
-                          ArabicNumbers().convert(pageNumber),
-                          style: const TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 16,
-                      ),
-                    ],
+          body: widget.getPagenumb == null
+              ? const Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 5,
+                    color: Color.fromARGB(255, 126, 113, 82),
                   ),
-                );
-              })),
+                )
+              : PageView.builder(
+                  controller: PageController(initialPage: widget.getPagenumb!),
+                  reverse: true,
+                  onPageChanged: (value) async {
+                    await savePage(value);
+                    setState(() {});
+                  },
+                  itemCount: 603,
+                  itemBuilder: (context, index) {
+                    pageNumber = index + 1;
+                    return Container(
+                      decoration: BoxDecoration(
+                          gradient: LinearGradient(colors: [
+                        index % 2 == 0
+                            ? const Color(0xffd6c08e)
+                            : const Color(0xffe5dabc),
+                        index % 2 == 0
+                            ? const Color(0xffe5dabc)
+                            : const Color(0xffd6c08e)
+                      ])),
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: PhotoView(
+                              backgroundDecoration: const BoxDecoration(
+                                  color: Colors.transparent),
+                              imageProvider: AssetImage(
+                                quran.QuranPages(pageNumber),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                                color: Colors.transparent,
+                                shape: BoxShape.circle),
+                            width: 50,
+                            height: 50,
+                            child: Text(
+                              ArabicNumbers().convert(pageNumber),
+                              style: const TextStyle(
+                                  fontSize: 24, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 16,
+                          ),
+                        ],
+                      ),
+                    );
+                  })),
     );
   }
 }
@@ -238,7 +247,8 @@ class SearchBar extends SearchDelegate {
           itemBuilder: (context, index) {
             return InkWell(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) {
                     print(Quran.getSurahPages(index + 1).first.toInt());
                     return HomePage(
                         getPagenumb:
