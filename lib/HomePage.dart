@@ -1,5 +1,6 @@
 // ignore_for_file: must_be_immutable, use_key_in_widget_constructors
 import 'package:arabic_numbers/arabic_numbers.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:quran_app/module/quran.dart';
@@ -23,7 +24,6 @@ class _HomePageState extends State<HomePage> {
   Future<void> savePage(int page) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setInt("page", page);
-    widget.getPagenumb = 0;
     print("Success");
   }
 
@@ -124,10 +124,11 @@ class _HomePageState extends State<HomePage> {
                   ),
                 )
               : PageView.builder(
+                  scrollBehavior: MaterialScrollBehavior(),
                   controller: PageController(initialPage: widget.getPagenumb!),
                   reverse: true,
                   onPageChanged: (value) async {
-                    await savePage(value);
+                    await savePage(value + 1);
                     setState(() {});
                   },
                   itemCount: 604,
@@ -254,8 +255,7 @@ class SearchBar extends SearchDelegate {
                       MaterialPageRoute(builder: (context) {
                     print(Quran.getSurahPages(index + 1).first.toInt());
                     return HomePage(
-                        getPagenumb:
-                            Quran.getSurahPages(index + 1).first.toInt());
+                        getPagenumb: Quran.getSurahPages(index + 1).first - 1);
                   }));
                 },
                 child: Center(
