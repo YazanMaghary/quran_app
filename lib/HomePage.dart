@@ -254,7 +254,8 @@ class SearchBar extends SearchDelegate {
                       MaterialPageRoute(builder: (context) {
                     print(Quran.getSurahPages(index + 1).first.toInt());
                     return HomePage(
-                        getPagenumb: Quran.getSurahPages(index).first.toInt());
+                        getPagenumb:
+                            Quran.getSurahPages(index + 1).first.toInt());
                   }));
                 },
                 child: Center(
