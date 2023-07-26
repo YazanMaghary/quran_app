@@ -104,7 +104,7 @@ class _HomePageState extends State<HomePage> {
                     if (save == null) {
                     } else {
                       // ignore: use_build_context_synchronously
-                      Navigator.push(context, MaterialPageRoute(
+                      Navigator.pushReplacement(context, MaterialPageRoute(
                         builder: (context) {
                           return HomePage(
                             getPagenumb: save! - 1,
