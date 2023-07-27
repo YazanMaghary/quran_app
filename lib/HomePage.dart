@@ -19,7 +19,7 @@ class _HomePageState extends State<HomePage> {
   QuranModule quran = QuranModule();
   QuranApi api = QuranApi();
   late int pageNumber = 0;
-
+  int savedPage = 0;
   bool isLoading = true;
   Future<void> savePage(int page) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -90,7 +90,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () async {
                     SharedPreferences shared =
                         await SharedPreferences.getInstance();
-                    shared.setInt("bookMark", pageNumber);
+                    shared.setInt("bookMark", savedPage);
                   },
                   child: const Icon(Icons.bookmark_add)),
               ElevatedButton(
@@ -99,19 +99,15 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () async {
                     SharedPreferences shared =
                         await SharedPreferences.getInstance();
-                    late int? save;
-                    save = shared.getInt("bookMark");
-                    if (save == null) {
-                    } else {
-                      // ignore: use_build_context_synchronously
-                      Navigator.pushReplacement(context, MaterialPageRoute(
-                        builder: (context) {
-                          return HomePage(
-                            getPagenumb: save! - 1,
-                          );
-                        },
-                      ));
-                    }
+
+                    // ignore: use_build_context_synchronously
+                    Navigator.pushReplacement(context, MaterialPageRoute(
+                      builder: (context) {
+                        return HomePage(
+                          getPagenumb: shared.getInt("bookMark"),
+                        );
+                      },
+                    ));
                   },
                   child: const Icon(Icons.bookmark)),
             ],
@@ -124,10 +120,11 @@ class _HomePageState extends State<HomePage> {
                   ),
                 )
               : PageView.builder(
-                  scrollBehavior: MaterialScrollBehavior(),
+                  scrollBehavior: const MaterialScrollBehavior(),
                   controller: PageController(initialPage: widget.getPagenumb!),
                   reverse: true,
                   onPageChanged: (value) async {
+                    savedPage = value;
                     await savePage(value + 1);
                     setState(() {});
                   },
